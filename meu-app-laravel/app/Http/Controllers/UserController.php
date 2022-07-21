@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreUpdateUserFormRequest;
+use App\Models\Team;
 
 class UserController extends Controller
 {
@@ -13,9 +14,11 @@ class UserController extends Controller
         $this->model = $user;
     }
 
-    public function index() 
+    public function index(Request $request) 
     {
-        $users = User::all();
+        $users = $this->model->getUsers(
+            $request->search ?? ''
+        );
         
         return view ('users.index', compact('users'));
     }
@@ -30,6 +33,12 @@ class UserController extends Controller
         $data = $request->all();
         $data['password'] = bcrypt($data['password']);
 
+        if($request['image']) {
+            $file = $request['image'];
+            $path = $file->store('profile','public');
+            $data['image'] = $path;
+        }
+
         $this->model->create($data);
 
         return redirect()->route('users.index');
@@ -38,13 +47,18 @@ class UserController extends Controller
     public function show($id)
     {
        /*  $user = User::where('id', $id)->first(); */
-        if(!$user = User::find($id)) {
+       /*  if(!$user = User::find($id)) {
             return redirect()->route('users.index');
         }
+         */
+       /*  $user->load('teams');
 
-        $title = "Usuário {$user->name}";
+        $title = "Usuário {$user->name}"; */
 
-        return view('users.show', compact('user', 'title'));
+        $team = Team::find($id);
+        $team->load('users');
+        return $team;
+       /*  return view('users.show', compact('user', 'title')); */
     }
 
     public function edit($id)
