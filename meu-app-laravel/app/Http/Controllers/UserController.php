@@ -46,19 +46,19 @@ class UserController extends Controller
 
     public function show($id)
     {
-       /*  $user = User::where('id', $id)->first(); */
-       /*  if(!$user = User::find($id)) {
+        $user = User::where('id', $id)->first();
+        if(!$user = User::find($id)) {
             return redirect()->route('users.index');
         }
-         */
-       /*  $user->load('teams');
+        
+        $user->load('teams');
 
-        $title = "Usuário {$user->name}"; */
+        $title = "Usuário {$user->name}";
 
-        $team = Team::find($id);
+        /* $team = Team::find($id);
         $team->load('users');
-        return $team;
-       /*  return view('users.show', compact('user', 'title')); */
+        return $team; */
+        return view('users.show', compact('user', 'title'));
     }
 
     public function edit($id)
@@ -85,12 +85,18 @@ class UserController extends Controller
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id) 
+    {
         $user = User::find($id);
         if(!$user) {
             return redirect()->route('users.index');
         }
         $user->delete();
         return redirect()->route('users.index');
+    }
+
+    public function admin()
+    {
+        return view('admin.index');
     }
 }
